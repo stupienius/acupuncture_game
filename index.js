@@ -6,6 +6,8 @@ canvas.height = 640;
 
 
 let score = 0;
+let goat = 3;
+let level = -1;
 const circle = document.querySelector(".circle");
 let firePremission = true; 
 
@@ -65,7 +67,6 @@ function needleOnCircle(){
     }))
 }
 needleOnCircle();
-console.log(rotateNeedle[0]);
 
 
 let rotateSpeed = 22.5;
@@ -76,7 +77,6 @@ function countDegree(){
     }else{
         circleDegree = 0;
     }
-    console.log(circleDegree);
     setTimeout(() => {
         this.countDegree();
     }, 1000/rotateSpeed);
@@ -115,11 +115,14 @@ function shoot(){
     mainNeedle.position.end.y = canvas.height - 10;
     needleOnCircle();
     score ++;
-    for(let i=0;i < needleDegree.length - 1;i++){
+    for(let i=0;i < score - 1;i++){
         if(needleDegree[i] >= needleDegree[score -1 ] - 3 && needleDegree[i] <= needleDegree[score - 1] + 3){
-            endGame();
+            endGame("fail");
             return;
         }
+    }
+    if(score === goat){
+        levelControler();
     }
 }
 
@@ -134,7 +137,7 @@ function fireCoolDown(){
 
 function animate(){
     window.requestAnimationFrame(animate);
-    circle.innerHTML = score;
+    circle.innerHTML = goat - score;
     c.fillStyle = "#222222";
     c.fillRect(0 ,0 , canvas.width, canvas.height);
     mainNeedle.update();
@@ -154,15 +157,45 @@ window.addEventListener("keydown",(event) => {
     }
 });
 
-function endGame(){
+function endGame(a){
     setTimeout(() => {
-        alert("End Game");
+        alert(a);
         rotateNeedle = [];
         needleDegree = [];
         score = 0;
+        level = -1;
+        goat = 3;
     }, 100);
+}
 
-    
+
+
+
+const maxLevel = 2;
+
+const defaultScenc = [[0,90,180,270],
+                    [120,240,0],
+                    [5,25]];
+
+const defaultScore = [4,3,2];
+
+const defaultgoat = [8,12,10];
+
+function levelControler(){
+    level ++;
+    if(level > maxLevel){
+        endGame("pass");
+        return;
+    }
+    score = defaultScore[level];
+    for (let i=0;i<score;i++){
+        needleDegree[i] = defaultScenc[level][i];
+    }
+    rotateNeedle = [];
+    for(let i=0;i<score;i++){
+        needleOnCircle();
+    }
+    goat = defaultgoat[level];
 }
 
 
