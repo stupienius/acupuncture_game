@@ -30,7 +30,11 @@ html ,html body{
     position: absolute;
     width: 100px;
     height: 100px;
-    top: 200px;
+    translate: 0 -70px;
     border-radius: 100%;
+    display: grid;
+    font-size: 30px;
+    place-content: center;
+    color: black;
     background-color: white;
 }

@@ -4,19 +4,10 @@ const c = canvas.getContext("2d");
 canvas.width = 1024;
 canvas.height = 640;
 
-// c.moveTo(0,0);
-// c.lineTo(canvas.width,canvas.height);
-// c.strokeStyle = "red";
-// c.lineWidth = 10;
-// c.stroke();
 
-// c.beginPath();
-// c.strokeStyle = "#ffffff";
-// c.lineWidth = 20;
-// c.moveTo(200 ,200);
-// c.lineTo(100 ,200);
-// c.arc(100 ,200 ,10 ,0 ,Math.PI * 2 , true);
-// c.stroke();
+let score = 0;
+const circle = document.querySelector(".circle");
+let firePremission = true; 
 
 class Needle {
     constructor({position,isRotate}) {
@@ -40,7 +31,7 @@ class Needle {
     }
     update(degree){
         if(this.isRotate){
-            this.rotate(degree);
+            this.rotate(degree%360);
         }
         this.draw();
     }
@@ -52,26 +43,32 @@ class Needle {
         this.position.start.y = 250 + 50*Math.sin(radians);
         this.position.end.x = 512 + 150*Math.cos(radians);
         this.position.end.y = 250 + 150*Math.sin(radians);
-        console.log(degree);
     }
 }
 
-const needle = new Needle({
-    position:{
-        start:{
-            x:canvas.width / 2,
-            y:298
-            
-        },
-        end:{
-            x:canvas.width / 2,
-            y:398
-        }
-    },
-    isRotate: true
-});
 
-let rotateSpeed = 180;
+let rotateNeedle = [];
+let needleDegree = [];
+function needleOnCircle(){
+    rotateNeedle.push(new Needle({
+        position:{
+            start:{
+                x:canvas.width / 2,
+                y:298
+            },
+            end:{
+                x:canvas.width / 2,
+                y:398
+            }
+        },
+        isRotate: true
+    }))
+}
+needleOnCircle();
+console.log(rotateNeedle[0]);
+
+
+let rotateSpeed = 22.5;
 let circleDegree = 0;
 function countDegree(){
     if(circleDegree < 359){
@@ -79,19 +76,93 @@ function countDegree(){
     }else{
         circleDegree = 0;
     }
+    console.log(circleDegree);
     setTimeout(() => {
         this.countDegree();
     }, 1000/rotateSpeed);
 }
-
 countDegree();
+
+
+let mainNeedle = new Needle({
+        position:{
+            start:{
+                x:canvas.width / 2 , 
+                y:canvas.height - 110
+            },
+            end:{
+                x:canvas.width / 2 , 
+                y:canvas.height - 10
+            }
+        },
+        isRotate: false
+    })
+
+function shoot(){
+    while(mainNeedle.position.start.y >= 298){
+        mainNeedle.position.start.y -= 0.5; 
+        mainNeedle.position.end.y -= 0.5;
+    }
+    console.log( Math.abs(90 - circleDegree));
+    if(circleDegree <= 90){
+        needleDegree[score] = 90 - circleDegree;    
+    }else{
+        needleDegree[score] = 360 - circleDegree + 90;
+    }
+    mainNeedle.position.start.x = canvas.width / 2;
+    mainNeedle.position.start.y = canvas.height - 110;
+    mainNeedle.position.end.x = canvas.width / 2;
+    mainNeedle.position.end.y = canvas.height - 10;
+    needleOnCircle();
+    score ++;
+    for(let i=0;i < needleDegree.length - 1;i++){
+        if(needleDegree[i] >= needleDegree[score -1 ] - 3 && needleDegree[i] <= needleDegree[score - 1] + 3){
+            endGame();
+            return;
+        }
+    }
+}
+
+function fireCoolDown(){
+    firePremission = false;
+    setTimeout(() => {
+        firePremission = true;
+    }, 50);
+}
+
+
 
 function animate(){
     window.requestAnimationFrame(animate);
-    c.fillStyle = "#101010";
+    circle.innerHTML = score;
+    c.fillStyle = "#222222";
     c.fillRect(0 ,0 , canvas.width, canvas.height);
-    needle.update(circleDegree);
+    mainNeedle.update();
+    for(let i=0;i<score;i++){
+        rotateNeedle[i].update(circleDegree + needleDegree[i]);
+    }
 }
 
 animate();
+
+window.addEventListener("keydown",(event) => {
+    if(event.key === " "){
+        if(firePremission){
+            shoot();
+            fireCoolDown();
+        }
+    }
+});
+
+function endGame(){
+    setTimeout(() => {
+        alert("End Game");
+        rotateNeedle = [];
+        needleDegree = [];
+        score = 0;
+    }, 100);
+
+    
+}
+
 
