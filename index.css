@@ -38,3 +38,28 @@ html ,html body{
     color: black;
     background-color: white;
 }
+
+#chooselevel {
+    text-align: center;
+    background-color: yellow;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+}
+
+#selectBar {
+    display: grid;
+    grid-template-columns: auto auto auto;
+    gap: 5px;
+    background-color: red;
+    height: 300px;
+    width: 100vw;
+}
+
+#selectBar div {
+    height: 80px;
+    background-color: pink;
+    font-size: 3rem;
+    text-align: center;
+}

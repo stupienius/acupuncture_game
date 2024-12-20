@@ -11,6 +11,18 @@ let level = -1;
 const circle = document.querySelector(".circle");
 let firePremission = true; 
 
+const maxLevel = 1;
+
+const defaultScenc = [[-1,90,180,270],
+                    [119,240,0],
+                    [4,25]];
+
+const defaultScore = [3,3,2];
+
+const defaultgoat = [7,12,20];
+
+
+
 class Needle {
     constructor({position,isRotate}) {
         this.position = position;
@@ -69,7 +81,7 @@ function needleOnCircle(){
 needleOnCircle();
 
 
-let rotateSpeed = 22.5;
+let rotateSpeed = 90;
 let circleDegree = 0;
 function countDegree(){
     if(circleDegree < 359){
@@ -119,7 +131,7 @@ function shoot(){
         if(needleDegree[i] >= needleDegree[score -1 ] - 3 && needleDegree[i] <= needleDegree[score - 1] + 3){
             endGame("fail");
             return;
-        }
+    }
     }
     if(score === goat){
         levelControler();
@@ -145,7 +157,6 @@ function animate(){
         rotateNeedle[i].update(circleDegree + needleDegree[i]);
     }
 }
-
 animate();
 
 window.addEventListener("keydown",(event) => {
@@ -169,17 +180,22 @@ function endGame(a){
 }
 
 
+function chooselevel(){
+    const a = document.querySelector('#selectBar');
+    for(let i=0;i<maxLevel+2;i++){
+        const block = document.createElement('div');
+        block.innerText = i+1;
+        block.addEventListener('click', () => {
+            level = i+1;
+            console.log(`Level set to: ${level}`);
+        });
+        a.appendChild(block);
+    }
+    
+}
+chooselevel();
 
 
-const maxLevel = 2;
-
-const defaultScenc = [[0,90,180,270],
-                    [120,240,0],
-                    [5,25]];
-
-const defaultScore = [4,3,2];
-
-const defaultgoat = [8,12,10];
 
 function levelControler(){
     level ++;
