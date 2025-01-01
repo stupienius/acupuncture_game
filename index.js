@@ -6,7 +6,7 @@ canvas.height = 640;
 
 
 
-const needleHeadRadius = 10;
+const needleHeadRadius = 8;
 const needleLenght = 100;
 
 
@@ -16,17 +16,29 @@ let level = -1;
 const circle = document.querySelector(".circle");
 let firePremission = true; 
 
-const maxLevel = 4;
+const maxLevel = 15;
 
-const defaultScenc = [[-1,90,180,270],
-                    [119,240,0],
-                    [4,25],
-                    [23,5,352,31,268]];
+const defaultScenc = [
+  [-1, 90, 180, 270],
+  [45, 135, 225, 315],
+  [4, 25, 75],
+  [10, 50, 100, 200, 300, 350],
+  [15, 30, 60, 120, 180, 240, 300],
+  [5, 75, 150, 225, 285, 330],
+  [0, 45, 90, 135, 180, 225, 270, 315],
+  [20, 60, 100, 140, 180, 220, 260, 300, 340],
+  [10, 30, 70, 110, 150, 210, 250, 290, 330],
+  [5, 25, 50, 100, 150, 200, 250, 300, 350],
+  [10, 40, 80, 120, 160, 200, 240, 280, 320, 360],
+  [0, 30, 90, 150, 210, 270, 330],
+  [10, 50, 90, 130, 170, 210, 250, 290, 330],
+  [15, 60, 120, 180, 240, 300],
+  [20, 80, 140, 200, 260, 320]
+];
 
-const defaultScore = [3,3,2,5];
+const defaultScore = [4, 3, 2, 5, 4, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15];
 
-const defaultgoat = [7,12,20,10];
-
+const defaultgoat = [7, 12, 20, 10, 15, 18, 25, 30, 35, 40, 45, 50, 55, 60, 65];
 
 
 class Needle {
@@ -87,7 +99,7 @@ function needleOnCircle(){
 needleOnCircle();
 
 
-let rotateSpeed = 90;
+let rotateSpeed = 85;
 let circleDegree = 0;
 function countDegree(){
     if(circleDegree < 359){
@@ -95,11 +107,9 @@ function countDegree(){
     }else{
         circleDegree = 0;
     }
-    setTimeout(() => {
-        this.countDegree();
-    }, 1000/rotateSpeed);
 }
-countDegree();
+
+setInterval(countDegree,1000/rotateSpeed);
 
 
 let mainNeedle = new Needle({
