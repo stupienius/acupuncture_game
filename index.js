@@ -5,21 +5,27 @@ canvas.width = 1024;
 canvas.height = 640;
 
 
+
+const needleHeadRadius = 10;
+const needleLenght = 100;
+
+
 let score = 0;
 let goat = 3;
 let level = -1;
 const circle = document.querySelector(".circle");
 let firePremission = true; 
 
-const maxLevel = 1;
+const maxLevel = 4;
 
 const defaultScenc = [[-1,90,180,270],
                     [119,240,0],
-                    [4,25]];
+                    [4,25],
+                    [23,5,352,31,268]];
 
-const defaultScore = [3,3,2];
+const defaultScore = [3,3,2,5];
 
-const defaultgoat = [7,12,20];
+const defaultgoat = [7,12,20,10];
 
 
 
@@ -38,7 +44,7 @@ class Needle {
         c.closePath();
         c.stroke();
         c.beginPath();
-        c.arc(this.position.end.x ,this.position.end.y ,4 ,0 ,Math.PI * 2 , true);
+        c.arc(this.position.end.x ,this.position.end.y ,needleHeadRadius ,0 ,Math.PI * 2 , true);
         c.fillStyle = "gray";
         c.closePath();
         c.fill();
@@ -53,10 +59,10 @@ class Needle {
 
         const radians = degree * Math.PI / 180;
 
-        this.position.start.x = 512 + 50*Math.cos(radians);
-        this.position.start.y = 250 + 50*Math.sin(radians);
-        this.position.end.x = 512 + 150*Math.cos(radians);
-        this.position.end.y = 250 + 150*Math.sin(radians);
+        this.position.start.x = canvas.width/2  + 50*Math.cos(radians);
+        this.position.start.y = canvas.height/2 - 70 + 50*Math.sin(radians);
+        this.position.end.x = canvas.width/2 + 150*Math.cos(radians);
+        this.position.end.y = canvas.height/2 - 70 + 150*Math.sin(radians);
     }
 }
 
@@ -68,11 +74,11 @@ function needleOnCircle(){
         position:{
             start:{
                 x:canvas.width / 2,
-                y:298
+                y:300
             },
             end:{
                 x:canvas.width / 2,
-                y:398
+                y:400 + needleLenght 
             }
         },
         isRotate: true
@@ -117,7 +123,7 @@ function shoot(){
     }
     console.log( Math.abs(90 - circleDegree));
     if(circleDegree <= 90){
-        needleDegree[score] = 90 - circleDegree;    
+        needleDegree[score] = 90 - circleDegree;
     }else{
         needleDegree[score] = 360 - circleDegree + 90;
     }
@@ -127,14 +133,19 @@ function shoot(){
     mainNeedle.position.end.y = canvas.height - 10;
     needleOnCircle();
     score ++;
+    const a = needleLenght + needleHeadRadius + 50;
+    const b = 2 * needleHeadRadius;
+    const cos = (2*a*a - b*b)/(2*a*a);
+    const collision = Math.acos(cos) * (180 / Math.PI);
+    console.log("collision = " + collision);
     for(let i=0;i < score - 1;i++){
-        if(needleDegree[i] >= needleDegree[score -1 ] - 3 && needleDegree[i] <= needleDegree[score - 1] + 3){
+        if(needleDegree[i] > needleDegree[score -1 ] - collision && needleDegree[i] < needleDegree[score - 1] + collision){
             endGame("fail");
             return;
     }
     }
     if(score === goat){
-        levelControler();
+        levelNavigation();
     }
 }
 
@@ -142,7 +153,7 @@ function fireCoolDown(){
     firePremission = false;
     setTimeout(() => {
         firePremission = true;
-    }, 50);
+    }, 10);
 }
 
 
@@ -169,25 +180,43 @@ window.addEventListener("keydown",(event) => {
 });
 
 function endGame(a){
-    setTimeout(() => {
+        setTimeout(() => {
         alert(a);
         rotateNeedle = [];
         needleDegree = [];
         score = 0;
         level = -1;
         goat = 3;
+        chooselevel();
     }, 100);
 }
 
 
 function chooselevel(){
+    const r = document.querySelector(".container");
     const a = document.querySelector('#selectBar');
-    for(let i=0;i<maxLevel+2;i++){
-        const block = document.createElement('div');
+    const d = document.querySelector("#chooselevel");
+
+    firePremission = false;
+    
+
+    document.querySelector(".showlevel").style.display = "none";
+
+    r.style.display = "none";
+    d.style.display = "flex";
+    
+
+    a.innerHTML = "";
+
+    for(let i=0;i<maxLevel;i++){
+        const block = document.createElement('button');
         block.innerText = i+1;
         block.addEventListener('click', () => {
-            level = i+1;
+            level = i-1;
             console.log(`Level set to: ${level}`);
+            levelControler();
+            d.style.display = "none";
+            r.style.display = "flex";
         });
         a.appendChild(block);
     }
@@ -196,13 +225,58 @@ function chooselevel(){
 chooselevel();
 
 
+function levelNavigation(){
+
+    if(level === maxLevel - 1){
+        levelControler();
+        return ;
+    }
+    const b = document.querySelector("#previous");
+    document.querySelector("#levelnavigation").style.display = "flex";
+
+    setTimeout(()=>{
+        firePremission = false;
+    },60);
+
+    if(level != 0){
+        b.style.display = "block";
+        
+    }else{
+        b.style.display = "none";
+    }
+}
+
+document.querySelector("#previous").addEventListener('click',() => {
+    level -= 2;
+    levelControler();
+    document.querySelector("#levelnavigation").style.display = "none";
+})
+document.querySelector("#home").addEventListener('click', () => {
+    chooselevel();
+    document.querySelector("#levelnavigation").style.display = "none";
+})
+document.querySelector("#next").addEventListener('click',() => {
+    levelControler();
+    document.querySelector("#levelnavigation").style.display = "none";
+})
+
+
 
 function levelControler(){
+
+    const a = document.querySelector(".showlevel");
+   
     level ++;
-    if(level > maxLevel){
+    if(level === maxLevel){
         endGame("pass");
         return;
     }
+    
+    a.style.display = "block";
+    a.innerHTML = "LEVEL " + (level+1);
+
+    firePremission = true;
+
     score = defaultScore[level];
     for (let i=0;i<score;i++){
         needleDegree[i] = defaultScenc[level][i];
@@ -212,6 +286,5 @@ function levelControler(){
         needleOnCircle();
     }
     goat = defaultgoat[level];
+    console.log(level);
 }
-
-
