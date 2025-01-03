@@ -189,6 +189,13 @@ window.addEventListener("keydown",(event) => {
     }
 });
 
+document.querySelector("body").addEventListener('click', () => {
+    if(firePremission){
+        shoot();
+        fireCoolDown();
+    }
+});
+
 function endGame(a){
         setTimeout(() => {
         alert(a);
@@ -285,7 +292,7 @@ function levelControler(){
     a.style.display = "block";
     a.innerHTML = "LEVEL " + (level+1);
 
-    firePremission = true;
+    setTimeout(()=>{firePremission = true},200);
 
     score = defaultScore[level];
     for (let i=0;i<score;i++){
